@@ -19,11 +19,24 @@ class CategoryNav extends Component
     {
         $data = Cache::remember('nav_categories', 3600, function () {
             return Category::select('id', 'title', 'slug')
-                ->orderBy('title', 'asc')
-                ->get();
+                ->orderBy('title')
+                ->get()
+                ->map(function ($category) {
+                    return [
+                        'id' => $category->id,
+                        'title' => $category->title,
+                        'slug' => $category->slug,
+                    ];
+                })
+                ->all();
         });
 
-        $this->categories = $data->chunk(ceil($data->count() / 3));
+        $data = collect($data)
+            ->map(fn ($category) => (object) $category);
+
+        $chunkSize = max(1, (int) ceil($data->count() / 3));
+
+        $this->categories = $data->chunk($chunkSize);
     }
 
     /**
