@@ -10,6 +10,12 @@ return Application::configure(basePath: dirname(__DIR__))
         web: __DIR__.'/../routes/web.php',
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
+        then: function () {
+            Route::middleware('api')
+                ->prefix('api')
+                ->name('api.')
+                ->group(__DIR__ . '/../routes/api.php');
+        }
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
